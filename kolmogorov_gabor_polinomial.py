@@ -43,6 +43,11 @@ class KolmogorovGaborPolynomial:
         model : LinearRegression
             Trained model from the final iteration.
         """
+        if not isinstance(X, pd.DataFrame):
+            raise ValueError("X должен быть DataFrame.")
+        if not isinstance(Y, (pd.DataFrame, pd.Series)):
+            raise ValueError("Y должен быть DataFrame или Series.")
+
         if stop is None:
             stop = len(X.columns)
         self.stop = stop
@@ -75,6 +80,8 @@ class KolmogorovGaborPolynomial:
 
         return self.models_dict[str(stop)]
 
+
+
     def predict(self, X, stop=None):
         """
         Predict based on the trained model.
@@ -99,7 +106,7 @@ class KolmogorovGaborPolynomial:
         predictions = model.predict(X)
 
         if stop == 1:
-            return predictions
+            return pd.DataFrame({'Predictions': predictions.flatten()}, index=range(len(predictions)))
 
         # Store the initial predictions from the first model and add powers for each iteration
         predict_polynomial_df = pd.DataFrame(index=X.index)
@@ -118,5 +125,7 @@ class KolmogorovGaborPolynomial:
         final_predictions = model.predict(predict_polynomial_df)
 
         # Возвращаем DataFrame с индексами
-        # return final_predictions
-        return pd.DataFrame({'Predictions': final_predictions}, index=range(len(final_predictions)))
+        return pd.DataFrame({'Predictions': final_predictions.flatten()}, index=range(len(final_predictions)))
+
+
+print('Polynomial succesfull added!')
